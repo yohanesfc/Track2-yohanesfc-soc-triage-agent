@@ -28,8 +28,12 @@ class SOCTriageAgent:
         }
 
         if llm_client is None:
-            from src.llm.mock_client import MockLLMClient
-            llm_client = MockLLMClient()
+            if mode == "demo":
+                from src.llm.mock_client import MockLLMClient
+                llm_client = MockLLMClient()
+            else:
+                from src.llm.client import LocalLLMClient
+                llm_client = LocalLLMClient()
         self.llm = llm_client
 
     def _tool_schemas(self) -> list[dict]:
