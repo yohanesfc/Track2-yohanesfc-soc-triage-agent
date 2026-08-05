@@ -1,4 +1,2 @@
 # Demo video
-
-TODO: add link once recorded (3-5 min, showing actual execution on Radeon GPU
-from command line/GUI to final result).
+https://github.com/yohanesfc/Track2-yohanesfc-soc-triage-agent/releases/download/v1.0-submission/Track2.Video-yohanesfc-soc-triage-agent.mp4
