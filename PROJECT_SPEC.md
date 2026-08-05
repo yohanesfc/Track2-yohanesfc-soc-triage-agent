@@ -74,6 +74,14 @@ data via `python -m src.main --mode demo`.
   data source (`tool_mode`) is decoupled from the LLM backend (`mode`), so the
   live-GPU model can be exercised against representative sample alert data
   while live Wazuh/Suricata/Greenbone API connectors remain future work.
+- **Why Qwen3-8B, not a cloud API:** AMD's Token Factory (the free, cloud-hosted
+  Model API) requires a mainland China phone number for account verification,
+  which wasn't available to us. Rather than depend on a cloud API we couldn't
+  even register for, this reinforced the case for genuine local deployment —
+  Qwen3-8B was downloadable via ModelScope (reachable from the sandbox
+  network, unlike huggingface.co) with no account gating at all, letting the
+  entire inference pipeline run privately, on the Radeon GPU itself, exactly
+  as Track 2 asks for.
 
 ## 5. Optimization description for inference speed on AMD Radeon GPU
 
