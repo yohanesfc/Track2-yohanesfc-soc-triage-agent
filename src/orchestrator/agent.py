@@ -16,15 +16,20 @@ from src.tools.greenbone_tool import GreenboneTool
 
 
 class SOCTriageAgent:
-    def __init__(self, mode: str = "demo", llm_client=None):
+    def __init__(self, mode: str = "demo", tool_mode: str = None, llm_client=None):
         self.mode = mode
+        # Tool data source defaults to "demo" (sample data) independent of the
+        # LLM backend, since live Wazuh/Suricata/Greenbone connectors are not
+        # yet implemented (see PROJECT_SPEC.md). This lets --mode live exercise
+        # the real GPU-served model with representative sample alert data.
+        self.tool_mode = tool_mode or "demo"
         self.memory = ConversationMemory()
         self.permissions = PermissionManager()
         self.retriever = KnowledgeRetriever()
 
         self.tools = {
             t.name: t
-            for t in [WazuhTool(mode=mode), SuricataTool(mode=mode), GreenboneTool(mode=mode)]
+            for t in [WazuhTool(mode=self.tool_mode), SuricataTool(mode=self.tool_mode), GreenboneTool(mode=self.tool_mode)]
         }
 
         if llm_client is None:
@@ -60,12 +65,12 @@ class SOCTriageAgent:
         messages = self.memory.as_messages()
         response = self.llm.chat(messages, tools=self._tool_schemas())
 
-        # If the model asked to call a tool, execute it and do a second turn
         if response.get("tool_calls"):
             for call in response["tool_calls"]:
                 import json as _json
                 name = call["function"]["name"]
                 args = _json.loads(call["function"]["arguments"])
+                print(f"  [tool call] {name}({args})")
                 result = self._call_tool(name, args)
                 self.memory.add("tool", f"{name} result: {result}")
 
@@ -82,7 +87,7 @@ class SOCTriageAgent:
     def run(self):
         """Interactive demo loop: triage each sample alert in sequence."""
         from src.tools.wazuh_tool import WazuhTool
-        alerts = WazuhTool(mode=self.mode).get_recent_alerts(limit=5)
+        alerts = WazuhTool(mode=self.tool_mode).get_recent_alerts(limit=5)
 
         for alert in alerts:
             print("=" * 60)
