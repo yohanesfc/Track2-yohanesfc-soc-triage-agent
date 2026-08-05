@@ -105,6 +105,12 @@ including one tool-calling round trip):
   (`/workspace/models/Qwen3-8B`) rather than a remote repo ID, avoiding
   repeated network round-trips during engine startup.
 
+**Radeon/vLLM inference optimizations active by default** (confirmed in
+startup logs): chunked prefill (`max_num_batched_tokens=2048`), prefix
+caching, and asynchronous scheduling were all enabled — these reduce
+time-to-first-token and improve throughput under concurrent requests on
+ROCm without requiring manual tuning.
+
 **Trade-off observed:** Qwen3's default "thinking mode" produces verbose
 chain-of-thought before the final answer (visible in the demo — ~1,030 tokens
 average per response), which improves triage reasoning quality but increases
